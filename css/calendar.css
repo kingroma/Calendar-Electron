@@ -1,0 +1,45 @@
+.calendar-cell {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    word-wrap:break-word; 
+    -webkit-line-clamp: 3; /* 라인수 */
+    -webkit-box-orient: vertical;
+}
+
+.calendar-day {
+    text-align: center;
+    padding:3px;
+}
+
+.calendar-head {
+    padding:10px;
+}
+
+.calendar-head-cell1 {
+    padding:10px;
+    padding-left:15px;
+    padding-right:15px;
+    border-radius: 10px;
+    border:1px solid #4a4a4a;
+}
+
+.calendar-head-cell2 {
+    padding:10px;
+    padding-left:15px;
+    padding-right:15px;
+    border-radius: 10px;
+}
+
+.calendar-menu {
+    margin:10px;
+    padding:10px;
+    text-align:center;
+    border-radius: 10px;
+}
+
+.calendar-cell-hidden-temp {
+    background-color: #717171;
+    border-radius: 5px;
+    margin: 1px;
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="./css/common.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/ui.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
+        
+        <script src="./lib/jquery-1.11.3.min.js"></script>
+        <script src="./js/ui/ui.js"></script>
+        <script src="./js/ui/calendar-ui.js"></script>
+        <script src="./js/func/calendar-func.js"></script>
+
+        <title>HI</title>
+    </head>
+
+    <body>
+        <div>
+            <!-- Login View -->
+        </div>
+        <div id='container' class='flex-display'>
+            <div style="background-color:#222222;width:70px;">
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(0)">C</div> <!-- Calendar -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(1)">T</div> <!-- Task -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(2)">M</div> <!-- Memo -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3)">T</div> <!-- Tree -->
+            </div>
+            <div id='main-calendar' class='flex-1 flex-display-column' style="background-color:#222222;">
+                <div class='calendar-head no-drag' style="background-color: #222222;">
+                    <div class='inline pointer common-hover calendar-head-cell1' onclick="javascript:today()">
+                        오늘
+                    </div>
+
+                    <div class='inline pointer common-hover calendar-head-cell2' onclick="javascript:prevMonth()">
+                        <
+                    </div>
+                    <div class='inline pointer common-hover calendar-head-cell2' onclick="javascript:nextMonth()">
+                        >
+                    </div>
+
+                    <div class='inline' style="font-size:1.2em">
+                        <b>
+                            <span id='calendar-year'></span>
+                            <span id='calendar-month'></span>
+                        </b>
+                    </div>
+                </div>
+                <div class='flex-1 flex-display' >
+                    <div class="flex-1 flex-display" >
+                        <div class='flex-1 flex-display-column' style="background-color: #333333;border-radius: 10px;">
+                            <div class='flex-display no-drag' >
+                                <div class='flex-1 calendar-day' style="color:rgb(255, 96, 96)">일</div>
+                                <div class='flex-1 calendar-day'>월</div>
+                                <div class='flex-1 calendar-day'>화</div>
+                                <div class='flex-1 calendar-day'>수</div>
+                                <div class='flex-1 calendar-day'>목</div>
+
+                                <div class='flex-1 calendar-day'>금</div>
+                                <div class='flex-1 calendar-day' style="color:rgb(97, 134, 200)">토</div>
+                            </div>
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-0'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-1'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-2'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-3'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-4'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-5'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-6'>
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-7'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-8'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-9'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-10'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-11'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-12'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-13'>
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-14'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-15'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-16'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-17'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-18'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-19'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-20'>
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-21'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-22'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-23'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-24'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-25'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-26'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-27'>
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-28'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-29'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-30'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-31'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-32'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-33'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-34'>
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-35'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-36'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-37'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-38'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-39'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-40'>
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-41'>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="width:15px;background-color: #222222;cursor:e-resize" id='task-bar'>
+                            <div style="margin-left:35%;margin-right:35%;width:30%;height:100%;background-color: #777777;border-radius:100px"></div>
+                        </div>
+
+                        <div class='' style="width:150px" id='task-div'>
+                            task
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Calendar -->
+
+            <div id='main-task' class='flex-1 flex-display-column' style='background-color:#888888;display:none'>
+                main-task
+            </div>
+
+            <div id='main-memo' class='flex-1 flex-display-column' style='background-color:#444444;display:none'>
+                main-memo
+            </div>
+
+            <div id='main-tree' class='flex-1 flex-display-column' style='background-color:#666666;display:none'>
+                main-tree
+            </div>
+        </div>
+    </body>
+</html>
+
+<script>
+    $(document).ready(function(){
+        $('.sample-text').each(function(){
+            var str = '';
+            for ( var i = 0 ; i < 10 ; i ++ ) {
+                str += Math.random() * 100
+            }
+
+            $(this).text(str)
+        })
+    })
+</script>
