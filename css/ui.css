@@ -12,7 +12,7 @@ html ,body , #container{
     color: white 
 }
 
-html {
+html , body {
     min-width: 1000px;
     min-height: 800px;
 }

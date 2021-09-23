@@ -5,6 +5,7 @@ $(document).ready(function(){
 });
 
 function initCalendarUi() {
+    console.log('initCalendarUi')
     $(window).on('mouseup',function(){
         stopCalendarUi();
     });

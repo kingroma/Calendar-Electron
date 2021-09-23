@@ -2,12 +2,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
         <link rel="stylesheet" type="text/css" href="./css/common.css"/>
         <link rel="stylesheet" type="text/css" href="./css/ui.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/login.css"/>
         <link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
         
         <script src="./lib/jquery-1.11.3.min.js"></script>
+        <script src="./lib/bootstrap.min.js"></script>
+        <script src="./js/func/common-func.js"></script>
         <script src="./js/ui/ui.js"></script>
+        <script src="./js/func/login-func.js"></script>
         <script src="./js/ui/calendar-ui.js"></script>
         <script src="./js/func/calendar-func.js"></script>
 
@@ -15,8 +20,43 @@
     </head>
 
     <body>
-        <div>
-            <!-- Login View -->
+        <div id='white-back' class="white-back" style="display:none"> <!-- Login View -->
+            
+        </div>
+        <div id='login-div' class='login-div flex-display-column' style="text-align:center;display:none" >
+            <div class='flex-3' ></div>
+            <div class='flex-2 flex-display' >
+                <div class='flex-1'></div>
+                <div class='flex-1 flex-display-column' style="padding:20px; background-color:#555555;border-radius: 30px;">
+                    <div class='flex-1 flex-display' style="height:100px;" >
+                        <div class='flex-1' style="text-align:right;padding:5px">
+                            Email
+                        </div>
+                        <div class='flex-2' style="text-align:left">
+                            <input id="email" type="text" class='form-control' placeholder="email" style='display:inline-block;width:250px;'/>
+                        </div>
+                    </div>
+                    <div class='flex-1 flex-display' style="height:100px;" >
+                        <div class='flex-1' style="text-align:right;padding:5px;">
+                            Password
+                        </div>
+                        <div class='flex-2' style="text-align:left">
+                            <input id='password' type="password" class='form-control' placeholder="password" style='display:inline-block;width:250px;'/>
+                        </div>
+                    </div>
+                    <div class='flex-1 flex-display-column' style="height:100px;" >
+                        <div class='flex-1' style="text-align:center;padding:5px;">
+                            <a href="javascript:login()" style="background-color:#999999;padding:5px;border-radius: 10px;">Login</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='flex-1'></div>
+            </div>
+            <div class='flex-3' >
+                <div id='login-error-div' style="color:red;text-align:center">
+                    
+                </div>
+            </div>
         </div>
         <div id='container' class='flex-display'>
             <div style="background-color:#222222;width:70px;">

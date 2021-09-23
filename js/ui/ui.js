@@ -8,6 +8,7 @@ $(document).ready(function(){
 })
 
 function initUi(){
+    console.log('initUi')
     $(window).on('mousemove',function(e){
         mouseX = e.pageX ;
         mouseY = e.pageY ;
@@ -41,4 +42,15 @@ function changeMenu(num){
         $('#main-memo').css("display",'none')
         $('#main-tree').css("display",'flex')
     }
+}
+
+
+function openWhiteBack(){
+    // $('#white-back').css("display","block");
+    $('#white-back').fadeIn(500);
+}
+
+function closeWhiteBack(){
+    // $('#white-back').css("display","none");
+    $('#white-back').fadeOut(400);
 }
