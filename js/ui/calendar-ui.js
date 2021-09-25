@@ -16,6 +16,9 @@ function initCalendarUi() {
         
         startTaskDivClick()
     })
+
+    setDatePicker($('#saveTaskBgnDs'));
+    setDatePicker($('#saveTaskEndDs'));
 }
 
 function stopCalendarUi(){
