@@ -31,6 +31,7 @@ function renderCalendar(yyyy,mm){
     getHolidayYyyy(yyyy);
 
     var list = getCalendarList ( yyyy,mm ) ; 
+    var userTasks = getUserTaskYyyyMm(yyyy,mm);
 
     $('#calendar-year').empty().append(yyyy+'년')
     $('#calendar-month').empty().append(mm+'월')
@@ -84,6 +85,7 @@ function renderCalendar(yyyy,mm){
 
         // body 
         var body = $('<div></div>');
+        // body.attr('id','calendar-cell-body-' + obj.yyyyMMdd)
         
         // clickTask
 
@@ -198,9 +200,17 @@ function calendarCellAnimation(){
 function checkCalendarCellHeight(){
     $('.calendar-cell').each(function(){
         var height = $(this).height() 
-        if ( height > 30 ) {
-            $(this).find('div[class=calendar-cell-hidden-temp]').remove();
 
+        $(this).find('div[class=calendar-cell-hidden-temp]').remove();
+
+        var cells = $(this).children();
+        for ( var i = 0 ; i < cells.length ; i ++ ) {
+            var cell = cells[i];
+            $(cell).css("display","block");
+        }
+
+        if ( height > 30 ) {
+            // $(this).find('div[class=calendar-cell-hidden-temp]').remove();
             var cells = $(this).find('div');
 
             var heightSum = 0 ; 
@@ -215,8 +225,11 @@ function checkCalendarCellHeight(){
                 }
             }
             
+            console.log(heightSum)
             if ( cutLine > 0 ){
+                console.log(cutLine)
                 for ( var i = 0 ; i < cells.length ; i ++ ) {
+                    console.log(i,cutLine);
                     var cell = cells[i];
                     if ( i < cutLine ) {
                         $(cell).css("display","block");
@@ -231,8 +244,13 @@ function checkCalendarCellHeight(){
                     + '</div>'
                 );
             }
-            
-        }
+        } else {
+            // var cells = $(this).find('div');
+            for ( var i = 0 ; i < cells.length ; i ++ ) {
+                var cell = cells[i];
+                $(cell).css("display","block");
+            }
+        } 
     })
 }
 
@@ -247,6 +265,7 @@ function getHolidayYyyy(yyyy){
         if ( holidayMap.get(yyyy) != null && holidayMap.get(yyyy) != undefined ) {
             return ; 
         } else {
+            openLoading();
             get(
                 url,
                 null,
@@ -275,9 +294,11 @@ function getHolidayYyyy(yyyy){
                 } , 
                 function(e){
                     console.error(e)
-                    alert('error',e);
+                    // alert('get hloiday data error',e);
+                    closeLoading();
                 }
             )
+            closeLoading();
         }
     }
     
@@ -292,8 +313,6 @@ function closeCalendarAddModal(){
 }
 
 function clickCellEvent(target,event){
-    console.log('clickCellEvent');
-
     target = $(target);
 
     var yyyy = target.attr('yyyy');
@@ -301,8 +320,7 @@ function clickCellEvent(target,event){
     var dd = target.attr('dd');
     
     
-    $('#saveTaskBgnDs').val(yyyy + '-' + mm + '-' + dd);
-    $('#saveTaskEndDs').val(yyyy + '-' + mm + '-' + dd);
+    $('#saveTaskDs').val(yyyy + '-' + mm + '-' + dd);
     $('#saveTaskName').val('');
     $('#saveTaskText').val('');
     $('#saveTaskSeq').val('');
@@ -320,26 +338,19 @@ function clickTask(d,event){
     event.stopPropagation();
 }
 
-function taskSave() {
+function taskSaveUI() {
     var check = /20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ ; 
 
     var saveTaskSeq = $('#saveTaskSeq').val() ;
-    var saveTaskBgnDs = $('#saveTaskBgnDs').val();
-    var saveTaskEndDs = $('#saveTaskEndDs').val();
+    var saveTaskDs = $('#saveTaskDs').val();
     var saveTaskName = $('#saveTaskName').val();
     var saveTaskText = $('#saveTaskText').val();
 
-    if ( saveTaskBgnDs == undefined || saveTaskBgnDs == null || 
-        saveTaskBgnDs.length != 10 || saveTaskBgnDs.match(check) == null ) {
+    if ( saveTaskDs == undefined || saveTaskDs == null || 
+        saveTaskDs.length != 10 || saveTaskDs.match(check) == null ) {
         alert('is not valid begin')
         return ; 
     }
-
-    // if ( saveTaskEndDs == undefined || saveTaskEndDs == null || 
-    //     saveTaskEndDs.length != 10 || saveTaskEndDs.match(check) == null ) {
-    //     alert('is not valid end')
-    //     return ; 
-    // }
 
     if ( saveTaskName == undefined || saveTaskName == null ||
         saveTaskName == '' ) {
@@ -355,14 +366,12 @@ function taskSave() {
         saveTaskSeq = null ; 
     }
 
-    saveTaskBgnDs = saveTaskBgnDs.replaceAll('-','') + '000000' ; 
-    saveTaskEndDs = saveTaskBgnDs ; // saveTaskEndDs.replaceAll('-','') + '000000' ; 
+    saveTaskDs = saveTaskDs.replaceAll('-','') ; 
 
     var data = JSON.stringify(
         {
             "taskSeq":saveTaskSeq,
-            "bgnDs":saveTaskBgnDs,
-            "endDs":saveTaskEndDs,
+            "taskDs":saveTaskDs,
             "taskName":saveTaskName,
             "taskText":saveTaskText
         }
@@ -372,6 +381,10 @@ function taskSave() {
 
     openLoading();
     
+    // var bodyTarget = $('#calendar-cell-body-' + saveTaskDs );
+    // bodyTarget.append('<div>asdf</div>')
+    addTaskAfter(saveTaskDs);
+
     post(
         '/calendar/user/task/save',
         data,
@@ -394,35 +407,38 @@ function taskSave() {
 				}
 
                 if ( message == '' ) {
-                    message = 'error'
+                    message = 'add task error'
                 }
 
                 alert(message);
             }
             closeLoading();
-            
         } , 
         function(e){
             // console.log('error',e)
-            alert('error',e);
+            alert('add task error',e);
+            closeCalendarAddModal();
             closeLoading();
         }
     )
 }
 
-function getTaskYyyyMm(yyyy,mm){
+function getUserTaskYyyyMm(yyyy,mm){
+    console.log(yyyy,mm)
     var result = null ; 
 
     if ( yyyy == undefined || yyyy == null ) {
         
     } else if ( mm == undefined || mm == null ) {
         
+    } else if ( userToken == null ) {
+
     } else {
         yyyy = '' + yyyy;
         mm = '' + mm ; 
         
         if ( mm.length == 1 ) {
-            mm = '0'+mm;
+            mm = '0' + mm;
         }
 
         var url = '/calendar/user/task/search/' + yyyy + '/' + mm + '/list';
@@ -444,4 +460,25 @@ function getTaskYyyyMm(yyyy,mm){
 
     return result ; 
 
+}
+
+function addTaskAfter(ds){
+    var target = null ; 
+
+    var list = $('.calendar-cell');
+
+    if ( list != null && list.length > 0 ) {
+        for ( var i = 0 ; i < list.length ; i ++ ) {
+            var obj = $(list[i]) ; 
+
+            var yyyymmdd = obj.attr('yyyymmdd');
+            if ( yyyymmdd == ds ){
+                target = obj ; 
+            }
+        }
+    }
+
+    if ( target != null ) {
+        target.append('<div>' + ds + '</div>')
+    }
 }
