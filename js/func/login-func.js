@@ -1,5 +1,5 @@
-var userSeq = null ; 
-var userToken = null ; 
+var userSeq = 1000000000 ; // null ; 
+var userToken = 'nMd0vvKG9N41JZBoX44bcllC72vBlN' ; // null ; 
 
 $(document).ready(function(){
     initLoginFunc();
@@ -25,16 +25,19 @@ function closeLoginView(){
 }
 
 function login(){
+    var errorDiv = $('#login-error-div');
     var email = $('#email').val();
     var password= $('#password').val();
 
     if ( email == undefined || email == null || email == '' ) {
-        alert('email is empty');
+        // alert('email is empty');
+        errorDiv.html('email is empty')
         return ; 
     }
 
     if ( password == undefined || password == null || password == '' ) {
-        alert('password is empty');
+        // alert('password is empty');
+        errorDiv.html('password is empty');
         return ; 
     }
 
@@ -46,7 +49,7 @@ function login(){
     )
 
     $('#login-error-div').html('');
-
+    openLoading();
     post(
         '/user/login',
         data,
@@ -55,28 +58,42 @@ function login(){
             if ( data != undefined && data != null && 
                 data.result != undefined && data.result != null && 
                 data.status != undefined && data.status == 200 ){
-
+                // 성공
+                var result = data.result ; 
+                userSeq = result.userSeq ; 
+                userToken = result.userToken ; 
+                closeLoginView();
             } else {
                 var message = '';
-
-                if ( data != undefined && data != null && 
-                    data.message != undefined && data.message != null){
-                        message += data.message;
-                }
+				
+				if ( data != undefined && data != null ) {
+					if ( data.status != undefined && data.status != null ) {
+						if ( data.status == 300 ) {
+							message = "아이디 에러";
+						} else if ( data.status == 800 ) {
+							message = "패스워드 에러"
+						}
+					} else if ( data.message != undefined && data.message != null){
+		            	message += data.message;
+		        	}
+				}
 
                 if ( message == '' ) {
                     message = 'error'
                 }
 
-                $('#login-error-div').html(message);
+                errorDiv.html(message);
             }
+            closeLoading();
             
         } , 
         function(e){
             // console.log('error',e)
             alert('error',e);
+            closeLoading();
         }
 
     );
+    
     
 }

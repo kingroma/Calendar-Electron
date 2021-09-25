@@ -1,27 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
-        <link rel="stylesheet" type="text/css" href="./css/common.css"/>
-        <link rel="stylesheet" type="text/css" href="./css/ui.css"/>
-        <link rel="stylesheet" type="text/css" href="./css/login.css"/>
-        <link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
         
-        <script src="./lib/jquery-1.11.3.min.js"></script>
-        <script src="./lib/bootstrap.min.js"></script>
+        <script src="./lib/jquery-1.12.4.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+        <!-- <scirpt src="./lib/jquery-ui.js"></scirpt> -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- <script src="./lib/bootstrap.min.js"></script> -->
+        <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        
+        <link rel="stylesheet" type="text/css" href="./lib/jquery-ui.css"/>
+        <!-- <link rel="stylesheet" href="https//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
+        <!-- <link rel="stylesheet" type="text/css" href="./lib/bootstrap.min.css"/> -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        
         <script src="./js/func/common-func.js"></script>
         <script src="./js/ui/ui.js"></script>
         <script src="./js/func/login-func.js"></script>
         <script src="./js/ui/calendar-ui.js"></script>
         <script src="./js/func/calendar-func.js"></script>
 
+        <link rel="stylesheet" type="text/css" href="./css/common.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/ui.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/login.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
+
+        
         <title>HI</title>
     </head>
 
     <body>
+        <div id='user-info' class='user-info' >
+            
+        </div>
         <div id='white-back' class="white-back" style="display:none"> <!-- Login View -->
             
+        </div>
+        <div id='loading-back' class='loading-back flex-display-column' style="text-align: center;display:none">
+            <div class="flex-1"></div>
+            <div class="flex-display flex-1">
+                <div class="flex-1"></div>
+                <div class="flex-1 loadingio-spinner-spinner-ncecknjdjj" style="background-color: transparent;">                    
+                    <div class="ldio-7t4hb337axi" style="margin-left:35% ;">
+                        <div></div><div></div><div></div>
+                        <div></div><div></div><div></div>
+                        <div></div><div></div><div></div>
+                        <div></div><div></div><div></div>
+                    </div>
+                </div> 
+                <div class="flex-1"></div>
+            </div>
+            <div class="flex-1"></div>
         </div>
         <div id='login-div' class='login-div flex-display-column' style="text-align:center;display:none" >
             <div class='flex-3' ></div>
@@ -66,6 +99,77 @@
                 <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3)">T</div> <!-- Tree -->
             </div>
             <div id='main-calendar' class='flex-1 flex-display-column' style="background-color:#222222;">
+                <div id='calendar-add-modal' style='display:none' >
+                    <div class='white-back' style="z-index:99" onclick="alert('aa')"></div>
+                    <div class='flex-display' style="width:100%;height:100%;position:absolute;z-index:200;min-height:800px">
+                        <div class='flex-1' onclick="closeCalendarAddModal()"></div>
+                        <div class='flex-2 flex-display-column' style="overflow:auto;" >
+                            <div class='flex-1' style="background-color: #555555;border-radius: 0px 0px 20px 20px;">
+                                <input type="hidden" id='saveTaskSeq' />
+                                <table style="width:90%;margin:5%;">
+                                    <colgroup>
+                                        <col width="13%"/>
+                                        <col/>
+                                        <col width="13%"/>
+                                        <col/>
+                                    </colgroup>
+                                    <tr>
+                                        <td colspan="4" style="text-align:right;">
+                                            <a class='a-button' href="javascript:taskSave()">
+                                                SAVE
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr style="height:15px">
+
+                                    </tr>
+                                    <tr>
+                                        <td class="calendar-add-modal-td-title">
+                                            Date
+                                        </td>
+                                        <td colspan="3">
+                                            <input type="text" class='form-control' id='saveTaskBgnDs' style="width:200px;"/>
+                                        </td>
+                                        <!--
+                                        <td class="calendar-add-modal-td-title">
+                                            End Date
+                                        </td>
+                                        <td>
+                                            <input type="text" class='form-control' id='saveTaskEndDs'/>
+                                        </td>
+                                        -->
+                                    </tr>
+                                    <tr style="height:15px">
+
+                                    </tr>
+                                    <tr>
+                                        <td class="calendar-add-modal-td-title" >
+                                            Task Title
+                                        </td>
+                                        <td colspan="3">
+                                            <input type="text" class='form-control' id='saveTaskName'/>
+                                        </td>
+                                    </tr>
+                                    <tr style="height:15px">
+
+                                    </tr>
+                                    <tr>
+                                        <td class="calendar-add-modal-td-title">
+                                            Task Text
+                                        </td>
+                                        <td colspan="3">
+                                            <textarea class='form-control' id='saveTaskText' rows="7"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class='flex-1' onclick="closeCalendarAddModal()">
+
+                            </div>
+                        </div>
+                        <div class='flex-1' onclick="closeCalendarAddModal()"></div>
+                    </div>
+                </div>
                 <div class='calendar-head no-drag' style="background-color: #222222;">
                     <div class='inline pointer common-hover calendar-head-cell1' onclick="javascript:today()">
                         오늘
@@ -99,145 +203,145 @@
                                 <div class='flex-1 calendar-day' style="color:rgb(97, 134, 200)">토</div>
                             </div>
                             <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-0'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-0' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-1'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-1' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-2'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-2' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-3'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-3' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-4'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-4' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-5'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-5' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-6'>
-                                    
-                                </div>
-                            </div>
-
-                            <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-7'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-8'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-9'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-10'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-11'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-12'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-13'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-6' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
                             </div>
 
                             <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-14'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-7' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-15'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-8' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-16'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-9' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-17'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-10' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-18'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-11' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-19'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-12' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-20'>
-                                    
-                                </div>
-                            </div>
-
-                            <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-21'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-22'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-23'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-24'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-25'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-26'>
-                                    
-                                </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-27'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-13' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
                             </div>
 
                             <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-28'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-14' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-29'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-15' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-30'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-16' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-31'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-17' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-32'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-18' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-33'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-19' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-34'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-20' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
                             </div>
 
                             <div class='flex-1 flex-display'>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-35'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-21' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-36'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-22' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-37'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-23' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-38'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-24' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-39'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-25' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-40'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-26' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
-                                <div class='flex-1 calendar-cell' id='calendar-cell-41'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-27' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-28' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-29' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-30' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-31' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-32' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-33' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-34' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                            </div>
+
+                            <div class='flex-1 flex-display'>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-35' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-36' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-37' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-38' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-39' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-40' onclick="javascript:clickCellEvent(this,event)">
+                                    
+                                </div>
+                                <div class='flex-1 calendar-cell' id='calendar-cell-41' onclick="javascript:clickCellEvent(this,event)">
                                     
                                 </div>
                             </div>

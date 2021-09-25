@@ -2,6 +2,7 @@ var ONE_DAY = 1000 * 3600 * 24 ;
 var SUNDAY_COLOR = 'rgb(255, 96, 96)' ; // '#aa0000';
 var SATURDAY_COLOR = 'rgb(97, 134, 200)';
 
+var holidayMap = new Map();
 var current = new Date();
 
 $(document).ready(function(){
@@ -27,6 +28,8 @@ function renderCalendar(yyyy,mm){
         mm = current.getMonth() + 1;
     }
 
+    getHolidayYyyy(yyyy);
+
     var list = getCalendarList ( yyyy,mm ) ; 
 
     $('#calendar-year').empty().append(yyyy+'년')
@@ -39,6 +42,7 @@ function renderCalendar(yyyy,mm){
         target.css("margin","5px")
 
         var obj = list[i];
+        var holiday = holidayMap.get(obj.yyyyMMdd) ;
 
         if ( obj.thisMonth == false ) {
             target.css("opacity","0.3")
@@ -57,25 +61,33 @@ function renderCalendar(yyyy,mm){
             head.css("background-color",SATURDAY_COLOR);
         }
 
+        else if ( holiday != undefined && holiday != null ){
+            head.css("background-color",SUNDAY_COLOR);
+        }
+
         else {
             head.css("background-color","#555555");
         }
 
         if ( obj.isToday == true ) {
-            head.css("background-color","white")
-            head.css("color","black")
+            head.css("border-bottom","3px solid white")
+            head.css("color","#abcdef")
         }
 
         head.append(obj.d);
+
+        if ( holiday != undefined && holiday != null ) {
+            head.append("&nbsp;&nbsp;<b>" + holiday.holidayName + "</b>")
+        }
+
         target.append(head);
 
-        if ( obj.d >= 30 ) {
-            for ( var j = 0 ; j < 10 ; j ++ ){
-                var body = $('<div></div>');
-                body.addClass('calendar-body-cell')
-                target.append(body);
-            }
-        }
+        // body 
+        var body = $('<div></div>');
+        
+        // clickTask
+
+        target.append(body);
 
         target.attr("yyyymmdd",obj.yyyyMMdd);
         target.attr("yyyy",obj.yyyy)
@@ -222,4 +234,214 @@ function checkCalendarCellHeight(){
             
         }
     })
+}
+
+function getHolidayYyyy(yyyy){
+    yyyy = '' + yyyy ; 
+    
+    var url ='/calendar/holiday/search/' + yyyy + '/list'
+    if ( yyyy == undefined || yyyy == null || yyyy.length != 4 ) {
+        console.error("yyyy is not valid")
+        return ; 
+    } else {
+        if ( holidayMap.get(yyyy) != null && holidayMap.get(yyyy) != undefined ) {
+            return ; 
+        } else {
+            get(
+                url,
+                null,
+                function(data){
+                    if ( data != undefined && data != null ) {
+                        if ( data.status != undefined && data.status != null ) {
+                            if ( data.status == 200 && data.result != undefined && data.result != null ) {
+                                
+                                for ( var i = 0 ; i < data.result.length ; i ++ ) {
+                                    var result = data.result[i] ; 
+                                    // console.log(result);
+                                    var yyyymmdd = result.holidayDs.substr(0,8);
+                                    var holidaySeq = result.holidaySeq ; 
+                                    var holidayName = result.holidayName ; 
+                                    holidayMap.set(
+                                        yyyymmdd,
+                                        {
+                                            "holidaySeq":holidaySeq,
+                                            "holidayName":holidayName
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } , 
+                function(e){
+                    console.error(e)
+                    alert('error',e);
+                }
+            )
+        }
+    }
+    
+}
+
+function openCalendarAddModal(){
+    $('#calendar-add-modal').slideDown(300);
+}
+
+function closeCalendarAddModal(){
+    $('#calendar-add-modal').slideUp(300);
+}
+
+function clickCellEvent(target,event){
+    console.log('clickCellEvent');
+
+    target = $(target);
+
+    var yyyy = target.attr('yyyy');
+    var mm = target.attr('mm');
+    var dd = target.attr('dd');
+    
+    
+    $('#saveTaskBgnDs').val(yyyy + '-' + mm + '-' + dd);
+    $('#saveTaskEndDs').val(yyyy + '-' + mm + '-' + dd);
+    $('#saveTaskName').val('');
+    $('#saveTaskText').val('');
+    $('#saveTaskSeq').val('');
+
+    openCalendarAddModal();
+
+    event.preventDefault();
+    event.stopPropagation();
+}
+
+function clickTask(d,event){
+    console.log('body')
+
+    event.preventDefault();
+    event.stopPropagation();
+}
+
+function taskSave() {
+    var check = /20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ ; 
+
+    var saveTaskSeq = $('#saveTaskSeq').val() ;
+    var saveTaskBgnDs = $('#saveTaskBgnDs').val();
+    var saveTaskEndDs = $('#saveTaskEndDs').val();
+    var saveTaskName = $('#saveTaskName').val();
+    var saveTaskText = $('#saveTaskText').val();
+
+    if ( saveTaskBgnDs == undefined || saveTaskBgnDs == null || 
+        saveTaskBgnDs.length != 10 || saveTaskBgnDs.match(check) == null ) {
+        alert('is not valid begin')
+        return ; 
+    }
+
+    // if ( saveTaskEndDs == undefined || saveTaskEndDs == null || 
+    //     saveTaskEndDs.length != 10 || saveTaskEndDs.match(check) == null ) {
+    //     alert('is not valid end')
+    //     return ; 
+    // }
+
+    if ( saveTaskName == undefined || saveTaskName == null ||
+        saveTaskName == '' ) {
+        alert('is not valid title')
+        return ; 
+    }
+
+    if ( saveTaskText == undefined || saveTaskText == null ) {
+        saveTaskText = '' ;
+    }
+
+    if ( saveTaskSeq == undefined || saveTaskSeq == null || saveTaskSeq == '' ) {
+        saveTaskSeq = null ; 
+    }
+
+    saveTaskBgnDs = saveTaskBgnDs.replaceAll('-','') + '000000' ; 
+    saveTaskEndDs = saveTaskBgnDs ; // saveTaskEndDs.replaceAll('-','') + '000000' ; 
+
+    var data = JSON.stringify(
+        {
+            "taskSeq":saveTaskSeq,
+            "bgnDs":saveTaskBgnDs,
+            "endDs":saveTaskEndDs,
+            "taskName":saveTaskName,
+            "taskText":saveTaskText
+        }
+    ) 
+
+    console.log(data);
+
+    openLoading();
+    
+    post(
+        '/calendar/user/task/save',
+        data,
+        function(data){
+            console.log('success',data)
+            if ( data != undefined && data != null && 
+                data.result != undefined && data.result != null && 
+                data.status != undefined && data.status == 200 ){
+                // 성공
+                var result = data.result ; 
+                alert('저장하였습니다');
+                closeCalendarAddModal();
+            } else {
+                var message = '';
+				
+				if ( data != undefined && data != null ) {
+					if ( data.message != undefined && data.message != null){
+		            	message += data.message;
+		        	}
+				}
+
+                if ( message == '' ) {
+                    message = 'error'
+                }
+
+                alert(message);
+            }
+            closeLoading();
+            
+        } , 
+        function(e){
+            // console.log('error',e)
+            alert('error',e);
+            closeLoading();
+        }
+    )
+}
+
+function getTaskYyyyMm(yyyy,mm){
+    var result = null ; 
+
+    if ( yyyy == undefined || yyyy == null ) {
+        
+    } else if ( mm == undefined || mm == null ) {
+        
+    } else {
+        yyyy = '' + yyyy;
+        mm = '' + mm ; 
+        
+        if ( mm.length == 1 ) {
+            mm = '0'+mm;
+        }
+
+        var url = '/calendar/user/task/search/' + yyyy + '/' + mm + '/list';
+
+        get(
+            url,
+            null , 
+            function(data){
+                if ( data != null && data != undefined && 
+                    data.result != null && data.result != undefined && 
+                    data.status != null && data.status == 200 ) {
+                    
+                    var list = data.result ; 
+                    result = data.result ; 
+                }
+            } 
+        )
+    }
+
+    return result ; 
+
 }
