@@ -5,6 +5,14 @@ var SATURDAY_COLOR = 'rgb(97, 134, 200)';
 var holidayMap = new Map();
 var current = new Date();
 
+var clickYyyy = null ; 
+var clickMm = null ; 
+var clickDd = null ; 
+
+var currentUserTasks = null ; 
+var currentTaskObj = null ; 
+var currentTaskSeqObj = new Map(); 
+
 $(document).ready(function(){
     // var today = new Date();
     // renderCalendar(current.getFullYear(), current.getMonth() + 1)
@@ -12,7 +20,28 @@ $(document).ready(function(){
 
     $(window).resize(function(){
         checkCalendarCellHeight();
+        $('#task-list-info-menu').css('display',"none");
     })
+
+    $('#task-list').on('contextmenu', function(event) {
+        
+        var target = $(event.target);
+        
+        if ( target.hasClass('task-list-item-task-name') == true ) {
+            var taskSeq = target.attr("taskSeq") ; 
+
+            var obj = currentTaskSeqObj.get(parseInt(taskSeq));
+            $('#task-list-info-menu').css('left',event.pageX);
+            $('#task-list-info-menu').css('top',event.pageY);
+
+            $('#task-list-info-menu').css('display','block')
+            $('#task-list-info-menu').css('z-index','100')
+
+            currentTaskObj = obj ; 
+        }
+
+        return false;
+    });
 });
 
 function clearCalendar(){
@@ -20,6 +49,7 @@ function clearCalendar(){
 }
 
 function renderCalendar(yyyy,mm){
+    openLoading();
     clearCalendar();
     calendarCellAnimation();
 
@@ -32,7 +62,12 @@ function renderCalendar(yyyy,mm){
 
     var list = getCalendarList ( yyyy,mm ) ; 
     var userTasks = getUserTaskYyyyMm(yyyy,mm);
-
+    currentUserTasks = userTasks ; 
+    
+    // if ( userTasks != null && userTasks.size > 0 ) {
+    //     console.log(yyyy,mm,userTasks);
+    // }
+    
     $('#calendar-year').empty().append(yyyy+'년')
     $('#calendar-month').empty().append(mm+'월')
 
@@ -54,6 +89,13 @@ function renderCalendar(yyyy,mm){
         var head = $('<div></div>');
         head.css("text-align","center")
         
+        var calendaCellHeadTaskCount = $('<div></div>')
+        calendaCellHeadTaskCount.css("position","absolute")
+        calendaCellHeadTaskCount.attr("id","calendar-cell-head-task-count-"+obj.yyyyMMdd)
+        calendaCellHeadTaskCount.css('padding-left',"3px");
+        
+        head.append(calendaCellHeadTaskCount)
+
         if ( obj.day == 0 ){
             head.css("background-color",SUNDAY_COLOR);
         }
@@ -62,12 +104,12 @@ function renderCalendar(yyyy,mm){
             head.css("background-color",SATURDAY_COLOR);
         }
 
-        else if ( holiday != undefined && holiday != null ){
-            head.css("background-color",SUNDAY_COLOR);
-        }
-
         else {
             head.css("background-color","#555555");
+        }
+
+        if ( holiday != undefined && holiday != null ){
+            head.css("background-color",SUNDAY_COLOR);
         }
 
         if ( obj.isToday == true ) {
@@ -81,11 +123,16 @@ function renderCalendar(yyyy,mm){
             head.append("&nbsp;&nbsp;<b>" + holiday.holidayName + "</b>")
         }
 
+        
+
         target.append(head);
 
         // body 
         var body = $('<div></div>');
-        // body.attr('id','calendar-cell-body-' + obj.yyyyMMdd)
+        body.addClass('calendar-cell-body')
+        body.attr('id','calendar-cell-body-' + obj.yyyyMMdd)
+        body.attr('yyyymmdd',obj.yyyyMMdd);
+        // console.log('userTasks',userTasks.get(obj.yyyyMMdd));
         
         // clickTask
 
@@ -104,7 +151,11 @@ function renderCalendar(yyyy,mm){
 
     setTimeout(function(){
         checkCalendarCellHeight();    
+        calendarCellBodySetting();
     },100)
+
+    clearTasks();
+    closeLoading();
 }
 
 /**
@@ -197,19 +248,28 @@ function calendarCellAnimation(){
     },100)
 }
 
-function checkCalendarCellHeight(){
+function checkCalendarCellHeight(inputYyyymmdd){
     $('.calendar-cell').each(function(){
         var height = $(this).height() 
 
         $(this).find('div[class=calendar-cell-hidden-temp]').remove();
 
         var cells = $(this).children();
+        var yyyymmdd = cells.attr('yyyymmdd');
+        var isTarget = true ; 
+
+        if ( inputYyyymmdd == undefined || inputYyyymmdd == null ) {
+
+        } else if ( inputYyyymmdd != yyyymmdd ) {
+            isTarget = false ; 
+        }
+
         for ( var i = 0 ; i < cells.length ; i ++ ) {
             var cell = cells[i];
             $(cell).css("display","block");
         }
-
-        if ( height > 30 ) {
+        
+        if ( false && isTarget && height > 30 ) {    
             // $(this).find('div[class=calendar-cell-hidden-temp]').remove();
             var cells = $(this).find('div');
 
@@ -225,11 +285,8 @@ function checkCalendarCellHeight(){
                 }
             }
             
-            console.log(heightSum)
             if ( cutLine > 0 ){
-                console.log(cutLine)
                 for ( var i = 0 ; i < cells.length ; i ++ ) {
-                    console.log(i,cutLine);
                     var cell = cells[i];
                     if ( i < cutLine ) {
                         $(cell).css("display","block");
@@ -276,7 +333,7 @@ function getHolidayYyyy(yyyy){
                                 
                                 for ( var i = 0 ; i < data.result.length ; i ++ ) {
                                     var result = data.result[i] ; 
-                                    // console.log(result);
+                                    
                                     var yyyymmdd = result.holidayDs.substr(0,8);
                                     var holidaySeq = result.holidaySeq ; 
                                     var holidayName = result.holidayName ; 
@@ -288,13 +345,15 @@ function getHolidayYyyy(yyyy){
                                         }
                                     )
                                 }
+
+                                holidayMap.set(yyyy,{})
                             }
                         }
                     }
                 } , 
                 function(e){
                     console.error(e)
-                    // alert('get hloiday data error',e);
+                    // alertMessage('get hloiday data error',e);
                     closeLoading();
                 }
             )
@@ -305,6 +364,23 @@ function getHolidayYyyy(yyyy){
 }
 
 function openCalendarAddModal(){
+    var yyyy = clickYyyy ; 
+    var mm = clickMm ; 
+    var dd = clickDd ; 
+
+    var yyyymmdd = '' ; 
+
+    if ( yyyy != null && mm != null && dd != null ) {
+        yyyymmdd = yyyy + '-' + mm + '-' + dd ;
+    }
+
+    $('#saveTaskDs').val(yyyymmdd);
+    $('#saveTaskName').val('');
+    $('#saveTaskText').val('');
+    $('#saveTaskSeq').val('');
+    $('#saveTaskBgc').val('#ffffff')
+    $('#saveTaskBgcText').val('#ffffff')
+
     $('#calendar-add-modal').slideDown(300);
 }
 
@@ -319,20 +395,27 @@ function clickCellEvent(target,event){
     var mm = target.attr('mm');
     var dd = target.attr('dd');
     
+    if ( clickYyyy == yyyy && clickMm == mm && clickDd == dd ) {
+
+    } else {
+        clearTasks();
+
+        clickYyyy = yyyy ; 
+        clickMm = mm ; 
+        clickDd = dd ; 
     
-    $('#saveTaskDs').val(yyyy + '-' + mm + '-' + dd);
-    $('#saveTaskName').val('');
-    $('#saveTaskText').val('');
-    $('#saveTaskSeq').val('');
+        $('#task-head-info').css("display","none")
+        $('#task-head-info').html(yyyy + '-' + mm + '-' + dd )
+        $('#task-head-info').fadeIn(200)
 
-    openCalendarAddModal();
-
+        taskListSetting();
+    }
+    
     event.preventDefault();
     event.stopPropagation();
 }
 
 function clickTask(d,event){
-    console.log('body')
 
     event.preventDefault();
     event.stopPropagation();
@@ -345,16 +428,17 @@ function taskSaveUI() {
     var saveTaskDs = $('#saveTaskDs').val();
     var saveTaskName = $('#saveTaskName').val();
     var saveTaskText = $('#saveTaskText').val();
+    var saveTaskBgc = $('#saveTaskBgc').val();
 
     if ( saveTaskDs == undefined || saveTaskDs == null || 
         saveTaskDs.length != 10 || saveTaskDs.match(check) == null ) {
-        alert('is not valid begin')
+        alertMessage('is not valid begin','FAIL')
         return ; 
     }
 
     if ( saveTaskName == undefined || saveTaskName == null ||
         saveTaskName == '' ) {
-        alert('is not valid title')
+        alertMessage('is not valid title','FAIL')
         return ; 
     }
 
@@ -373,29 +457,34 @@ function taskSaveUI() {
             "taskSeq":saveTaskSeq,
             "taskDs":saveTaskDs,
             "taskName":saveTaskName,
-            "taskText":saveTaskText
+            "taskText":saveTaskText,
+            "taskBgc":saveTaskBgc
         }
     ) 
-
-    console.log(data);
 
     openLoading();
     
     // var bodyTarget = $('#calendar-cell-body-' + saveTaskDs );
     // bodyTarget.append('<div>asdf</div>')
-    addTaskAfter(saveTaskDs);
+    // addTaskAfter(saveTaskDs);
 
     post(
         '/calendar/user/task/save',
         data,
         function(data){
-            console.log('success',data)
             if ( data != undefined && data != null && 
                 data.result != undefined && data.result != null && 
                 data.status != undefined && data.status == 200 ){
                 // 성공
                 var result = data.result ; 
-                alert('저장하였습니다');
+                alertMessage('저장하였습니다','SUCC');
+                if ( saveTaskSeq == null ) {
+                    $('#task-list').append(taskListSettingItem(result));
+                    // autosize($('.task-list-item-detail-textarea'));
+                } else {
+                    changeTaskListItem(result);
+                }
+                currentUserTasks = getUserTaskYyyyMm(clickYyyy,clickMm)
                 closeCalendarAddModal();
             } else {
                 var message = '';
@@ -410,21 +499,26 @@ function taskSaveUI() {
                     message = 'add task error'
                 }
 
-                alert(message);
+                alertMessage(message,'FAIL');
             }
             closeLoading();
         } , 
         function(e){
-            // console.log('error',e)
-            alert('add task error',e);
+            alertMessage('add task error','FAIL');
             closeCalendarAddModal();
             closeLoading();
         }
     )
+    calendarCellBodySetting(saveTaskDs);
+
+    var tempYyyymmdd = clickYyyy + '' + '' + clickMm + '' + clickDd  ; 
+    if ( saveTaskDs != tempYyyymmdd ) {
+        $('#task-list-item-'+saveTaskSeq).fadeOut(300);
+        calendarCellBodySetting(tempYyyymmdd);
+    }
 }
 
 function getUserTaskYyyyMm(yyyy,mm){
-    console.log(yyyy,mm)
     var result = null ; 
 
     if ( yyyy == undefined || yyyy == null ) {
@@ -451,8 +545,22 @@ function getUserTaskYyyyMm(yyyy,mm){
                     data.result != null && data.result != undefined && 
                     data.status != null && data.status == 200 ) {
                     
-                    var list = data.result ; 
-                    result = data.result ; 
+                    var map = new Map();
+                    
+                    for ( var i = 0 ; i < data.result.length ; i ++ ) {
+                        var obj = data.result[i];
+
+                        var list = map.get(obj.taskDs);
+
+                        if ( list == undefined || list == null ) {
+                            list = [] ; 
+                        }
+
+                        list.push(obj);
+                        map.set(obj.taskDs,list);
+                        currentTaskSeqObj.set(obj.taskSeq,obj);
+                    }
+                    result = map ; 
                 }
             } 
         )
@@ -481,4 +589,378 @@ function addTaskAfter(ds){
     if ( target != null ) {
         target.append('<div>' + ds + '</div>')
     }
+}
+
+function clearTasks(){
+    $('#task-head-info').html('')
+    $('#task-list').empty();
+
+    clickYyyy = null ; 
+    clickMm = null ; 
+    clickDd = null ; 
+}
+
+function taskListSetting() {
+    var yyyy = clickYyyy ; 
+    var mm = clickMm ; 
+    var dd = clickDd ; 
+
+    if ( currentUserTasks != null ) {
+        var tasks = currentUserTasks.get(yyyy+''+mm+''+dd);
+        var target = $('#task-list');
+        if ( tasks != undefined && tasks != null ) {
+            for ( var i = 0 ; i < tasks.length ; i ++ ) {
+                var obj = tasks[i] ; 
+
+                // mix-blend-mode: difference;
+                target.append(taskListSettingItem(obj))
+                currentTaskSeqObj.set(obj.taskSeq,obj)
+                // autosize($('.task-list-item-detail-textarea'));
+            }
+        } 
+    }   
+}
+
+function taskListSettingItem(obj){
+    var backgroundColor = obj.taskBgc ; 
+    if ( backgroundColor == undefined || backgroundColor == null || backgroundColor == '') {
+        backgroundColor = '#ffffff';
+    }
+    
+    var root = $('<div></div>');
+    root.attr('id','task-list-item-' + obj.taskSeq);
+
+    var taskItem = $('<div></div>');
+    taskItem.addClass('flex-display')
+
+    var divTaskName = $('<div></div>');
+    divTaskName.addClass('flex-1')
+    divTaskName.addClass('ellipsis')
+    divTaskName.addClass('task-list-item-task-name');
+    divTaskName.append(obj.taskName)
+    divTaskName.attr('id','task-list-item-task-name-' + obj.taskSeq);
+    divTaskName.attr('taskseq',obj.taskSeq);
+    divTaskName.css("margin","5px");
+    divTaskName.css("margin-right","10px")
+    divTaskName.css("background-color",backgroundColor)
+    divTaskName.css('mix-blend-mode','difference')
+    divTaskName.css('color',invertColor2(backgroundColor))
+    divTaskName.css('border-radius','5px')
+    divTaskName.css('padding','3px')
+    divTaskName.css("margin-top","8px");
+
+    // divTaskName.attr('onclick','taskListItemClick(\''+JSON.stringify(obj)+'\')');
+    divTaskName.click('on',function(event){
+        // taskListItemClick(\''+JSON.stringify(obj)+'\')
+        taskListItemClick(obj)
+    })
+
+    taskItem.append(divTaskName)
+    
+    var divtaskFinish = $('<div></div>')
+    if ( obj.taskFinish == false || obj.taskFinish == undefined || obj.taskFinish == null ) {
+        divtaskFinish.append('<img src="./assets/square.png" width="25px" height="25px" style="vertical-align:text-top;background-color:#777777;padding:5px;border-radius:10px;"/>')
+    } else {
+        divtaskFinish.append('<img src="./assets/check.png" width="25px" height="25px" style="vertical-align:text-top;background-color:inherit;padding:5px;border-radius:10px;"/>')
+    }
+    divtaskFinish.css("margin","5px");
+    divtaskFinish.css('padding','3px')
+    divtaskFinish.css("margin-bottom","0px");
+    divtaskFinish.on('click',function(event){
+        taskFinishClick(obj,this,event);
+    })
+    taskItem.append(divtaskFinish);
+
+    var taskShow = $('<div></div>');
+    if ( obj.taskShow == false || obj.taskShow == undefined || obj.taskShow == null ) {
+        taskShow.append('<img src="./assets/star_empty.png" width="25px" height="25px" style="vertical-align:text-top;background-color:#777777;padding:5px;border-radius:10px;"/>')
+    } else {
+        taskShow.append('<img src="./assets/star.png" width="25px" height="25px" style="vertical-align:text-top;background-color:inherit;padding:5px;border-radius:10px;"/>')
+    }
+    taskShow.css("margin","5px");
+    taskShow.css('padding','3px')
+    taskShow.css("margin-bottom","0px");
+    taskShow.on('click',function(event){
+        taskShowClick(obj,this,event);
+    })
+    taskItem.append(taskShow)
+    
+
+    root.append(taskItem)
+
+    var divTaskDetail = $('<div></div>');
+
+    var divTaskDetailHead = $('<div></div>');
+
+    // divTaskDetailHead.css("position","absolute");
+    divTaskDetailHead.css("text-align","right")
+
+    // var divTaskDetailSaveButtonA = $('<a></a>');
+    // divTaskDetailSaveButtonA.addClass('pointer common-hover no-drag');
+    // divTaskDetailSaveButtonA.append('update')
+    // divTaskDetailSaveButtonA.attr("onclick","taskListItemUpdateClick()")
+    // divTaskDetailSaveButtonA.css("padding","5px");
+    // divTaskDetailSaveButtonA.css("margin","5px");
+    // divTaskDetailSaveButtonA.css("border-radius","10px")
+
+    // divTaskDetailHead.append(divTaskDetailSaveButtonA);
+
+    divTaskDetail.append(divTaskDetailHead);
+
+    var divTaskDetailText = obj.taskText ;
+    
+    if ( divTaskDetailText == undefined || divTaskDetailText == null || divTaskDetailText == '' ) {
+        // divTaskDetailText = "EMPTY"
+    }
+
+    divTaskDetail.attr("id","task-list-item-info-"+obj.taskSeq)
+    divTaskDetail.addClass("task-list-item-info");
+    // divTaskDetail.append(divTaskDetailText)
+    divTaskDetail.css("padding","5px");
+    divTaskDetail.css("display","none")
+
+    var divTaskDetailTextDiv = $('<div></div>');
+    divTaskDetailTextDiv.append(
+        '<div style="width:100%;color:white" id="task-list-item-task-text-' + obj.taskSeq + '" class="task-list-item-detail-textarea" readonly="readonly" >' + 
+        divTaskDetailText.replaceAll('\n','<br />') + 
+        '</div>'
+    );
+    divTaskDetailTextDiv.css("border","1px solid #666666");
+    divTaskDetailTextDiv.css("border-radius","5px");
+    divTaskDetailTextDiv.css("margin-top","3px");
+    divTaskDetailTextDiv.css("padding","5px")
+
+    divTaskDetail.append(divTaskDetailTextDiv);
+
+    root.append(divTaskDetail)
+    root.css('display',"none");
+    root.fadeIn(500);
+
+    return root ; 
+}
+
+function taskListItemClick(obj){
+    if ( obj == undefined || obj == null ) {
+
+    } else { 
+        // obj = JSON.parse(obj);
+        if ( $('#task-list-item-info-'+obj.taskSeq).css("display") == "none" ) {
+            currentTaskObj = obj ; 
+
+            $('.task-list-item-info').slideUp(100);
+            $('#task-list-item-info-'+obj.taskSeq).slideDown(100);
+            // autosize($('.task-list-item-detail-textarea'));
+        } else if ($('#task-list-item-info-'+obj.taskSeq).css("display") == "block") {
+            $('#task-list-item-info-'+obj.taskSeq).slideUp(100);
+        }
+    } 
+    
+}
+
+function taskListItemUpdateClick(){
+    $('#task-list-info-menu').css('display',"none")
+    var obj = currentTaskObj ; 
+
+    $('#saveTaskDs').val(
+        obj.taskDs.substr(0,4) + '-' + 
+        obj.taskDs.substr(4,2) + '-' + 
+        obj.taskDs.substr(6,2)
+    );
+
+    $('#saveTaskName').val(obj.taskName);
+    $('#saveTaskText').val(obj.taskText);
+    $('#saveTaskSeq').val(obj.taskSeq);
+    $('#saveTaskBgc').val(obj.taskBgc)
+    $('#saveTaskBgcText').val(obj.taskBgc)
+
+    $('#calendar-add-modal').slideDown(300);
+}
+
+
+function changeTaskListItem(obj){
+    // task-list-item-task-text-    
+    // task-list-item-task-name-
+    var divTaskName = $('#task-list-item-task-name-' + obj.taskSeq);
+    var backgroundColor = obj.taskBgc ; 
+    if ( backgroundColor == undefined || backgroundColor == null || backgroundColor == '') {
+        backgroundColor = '#ffffff';
+    }
+    divTaskName.css("background-color",backgroundColor)
+    divTaskName.css('mix-blend-mode','difference')
+    divTaskName.css('color',invertColor2(backgroundColor))
+    divTaskName.empty();
+    divTaskName.append(obj.taskName)
+
+    var divTaskText = $('#task-list-item-task-text-' + obj.taskSeq); 
+    divTaskText.empty();
+    divTaskText.append(obj.taskText);
+}
+
+function taskListItemDeleteClick(){
+    var obj = currentTaskObj; 
+
+    if ( obj != undefined && obj != null ) { 
+        openLoading();
+
+        var data = JSON.stringify(obj);
+
+        post(
+            '/calendar/user/task/delete',
+            data,
+            function(data){
+                if ( data != undefined && data != null && 
+                    data.result != undefined && data.result != null && 
+                    data.status != undefined && data.status == 200 ){
+                    // 성공
+                    var result = data.result ; 
+                    // console.log(result);
+                    $('#task-list-item-'+result.taskSeq).fadeOut(300);
+                    currentUserTasks = getUserTaskYyyyMm(clickYyyy,clickMm)
+                    calendarCellBodySetting(clickYyyy + '' + clickMm + '' + clickDd);
+                    alertMessage('삭제완료','SUCC')
+                } else {
+                    var message = '';
+                    
+                    if ( data != undefined && data != null ) {
+                        if ( data.message != undefined && data.message != null){
+                            message += data.message;
+                        }
+                    }
+    
+                    if ( message == '' ) {
+                        message = 'delete task error'
+                    }
+    
+                    alertMessage(message,'FAIL');
+                }
+                closeLoading();
+            } , 
+            function(e){
+                alertMessage('delete task error','FAIL');
+                closeLoading();
+            }
+        )
+
+        closeLoading();
+    }
+}
+
+function calendarCellBodySetting(intputYyyymmdd){
+    var calendarCellBodies = $('.calendar-cell-body'); 
+
+    var targets = [] ; 
+
+    for ( var i = 0 ; i < calendarCellBodies.length ; i ++) {
+        var body = $(calendarCellBodies[i]);
+        var yyyymmdd = body.attr('yyyymmdd');
+
+        if ( intputYyyymmdd == undefined || intputYyyymmdd == null ) {
+            targets.push(body);
+        } else if ( intputYyyymmdd == yyyymmdd ) {
+            targets.push(body);
+        }      
+    }
+
+    for ( var i = 0 ; i < targets.length ; i ++) {
+        var body = $(targets[i]);
+        var yyyymmdd = body.attr('yyyymmdd');
+        body.empty();
+
+        var userTasks = currentUserTasks.get(yyyymmdd);
+        var calendarCellHeadTaskCount =  $('#calendar-cell-head-task-count-'+yyyymmdd);
+        calendarCellHeadTaskCount.empty();
+        
+        if ( userTasks != undefined && userTasks != null && userTasks.length > 0 ) {
+            calendarCellHeadTaskCount.append(
+                '<span style="font-size:1.2em">' + userTasks.length + '</span>');
+            calendarCellHeadTaskCount.append(
+                '<img width="20px" height="20px" src="./assets/task_head_count.png" style="vertical-align:text-top"/>'
+                )
+            calendarCellHeadTaskCount.css("margin-top",'-3px')
+            calendarCellHeadTaskCount.css("padding-left",'4px')
+            calendarCellHeadTaskCount.css("color",'white')
+
+            for ( var j = 0 ; j < userTasks.length ; j ++ ){
+                var userTask = userTasks[j]
+
+                if ( true == userTask.taskShow ){
+                    var div = $('<div></div>')
+                    div.css('background-color',userTask.taskBgc);
+                    div.css('color',invertColor2(userTask.taskBgc))
+                    div.css('padding',"1px")
+                    div.css('margin-bottom',"3px")
+                    div.css('border-radius','1px')
+                    div.append(userTask.taskName)
+                    body.append(div)
+                }
+                
+                checkCalendarCellHeight(userTask.taskDs)
+            }
+        }
+        
+    }
+}
+
+function taskShowClick(obj,div,event){
+    obj = currentTaskSeqObj.get(obj.taskSeq);
+    var div = $(div);
+    var img = div.find('img');
+    var taskShow = obj.taskShow ;
+
+    if ( taskShow == undefined || taskShow == null || taskShow == false ) {
+        img.attr('src','./assets/star.png')    
+        img.css('background-color','inherit')    
+        taskShow = true ; 
+    } else {
+        img.attr('src','./assets/star_empty.png')    
+        img.css('background-color','#777777')    
+        taskShow = false ; 
+    }
+
+    var data = JSON.stringify(
+        {
+            "taskSeq":obj.taskSeq ,
+            "taskShow":taskShow
+        }
+    );
+
+    post(
+        '/calendar/user/task/save',
+        data 
+    )
+    
+    currentUserTasks = getUserTaskYyyyMm(clickYyyy,clickMm) ; 
+    calendarCellBodySetting(obj.taskDs);
+}
+
+function taskFinishClick(obj,div,event){
+    obj = currentTaskSeqObj.get(obj.taskSeq);
+    var div = $(div);
+    var img = div.find('img');
+    var taskFinish = obj.taskFinish ; 
+    
+    if ( taskFinish == undefined || taskFinish == null || taskFinish == false ) {
+        img.attr('src','./assets/check.png')    
+        img.css('background-color','inherit')    
+        taskFinish = true ; 
+    } else {
+        img.attr('src','./assets/square.png')    
+        img.css('background-color','#777777')    
+        taskFinish = false ; 
+    }
+
+    var data = JSON.stringify(
+        {
+            "taskSeq":obj.taskSeq ,
+            "taskFinish":taskFinish
+        }
+    );
+
+    post(
+        '/calendar/user/task/save',
+        data 
+    )
+
+    currentUserTasks = getUserTaskYyyyMm(clickYyyy,clickMm) ; 
+    calendarCellBodySetting(obj.taskDs);
 }

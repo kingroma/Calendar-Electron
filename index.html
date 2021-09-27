@@ -11,7 +11,8 @@
         <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        
+        <script src="./lib/autosize.min.js"></script>
+
         <link rel="stylesheet" type="text/css" href="./lib/jquery-ui.css"/>
         <!-- <link rel="stylesheet" href="https//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
         <!-- <link rel="stylesheet" type="text/css" href="./lib/bootstrap.min.css"/> -->
@@ -30,7 +31,7 @@
         <link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
 
         
-        <title>HI</title>
+        <title>Calendar</title>
     </head>
 
     <body>
@@ -91,12 +92,15 @@
                 </div>
             </div>
         </div>
+        <div id='message-div' style='position:fixed;right:0px;top:0px;z-index:999'>
+            
+        </div>
         <div id='container' class='flex-display'>
             <div style="background-color:#222222;width:70px;">
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(0)">C</div> <!-- Calendar -->
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(1)">T</div> <!-- Task -->
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(2)">M</div> <!-- Memo -->
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3)">T</div> <!-- Tree -->
+                <div class='calendar-menu pointer no-drag menu-open' onclick="changeMenu(0,event)"><img src="./assets/calendar.png" width="25px" height="25px"  /></div> <!-- Calendar -->
+                <!-- <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(1,event)">T</div> Task -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(2,event)">M</div> <!-- Memo -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3,event)">T</div> <!-- Tree -->
             </div>
             <div id='main-calendar' class='flex-1 flex-display-column' style="background-color:#222222;">
                 <div id='calendar-add-modal' style='display:none' >
@@ -128,7 +132,7 @@
                                             Task Date
                                         </td>
                                         <td colspan="3">
-                                            <input type="text" class='form-control' id='saveTaskDs' style="width:200px;"/>
+                                            <input type="text" class='form-control' id='saveTaskDs' style="width:200px;" readonly="readonly"/>
                                         </td>
                                     </tr>
                                     <tr style="height:15px">
@@ -150,7 +154,24 @@
                                             Task Text
                                         </td>
                                         <td colspan="3">
-                                            <textarea class='form-control' id='saveTaskText' rows="7"></textarea>
+                                            <textarea class='form-control' id='saveTaskText' rows="5"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr style="height:15px">
+
+                                    </tr>
+                                    <tr>
+                                        <td class="calendar-add-modal-td-title">
+                                            Background
+                                        </td>
+                                        <td>
+                                            <input type='color' class='form-control' id='saveTaskBgc' onchange="$('#saveTaskBgcText').val($(this).val());" />
+                                        </td>
+                                        <td>
+                                             
+                                        </td>
+                                        <td>
+                                            <input type="text" class='form-control' id='saveTaskBgcText' onchange="$('#saveTaskBgc').val($(this).val())" style="width:150px;" />
                                         </td>
                                     </tr>
                                 </table>
@@ -343,8 +364,35 @@
                             <div style="margin-left:35%;margin-right:35%;width:30%;height:100%;background-color: #777777;border-radius:100px"></div>
                         </div>
 
-                        <div class='' style="width:150px" id='task-div'>
-                            task
+                        <div class='flex-display-column' style="width:300px" id='task-div'>
+                            <div style="width:inherit; border-bottom:1px solid #555555;height:2.3em;" >
+                                <div style='position:absolute;text-align: right;width:inherit' >
+                                    <a class='pointer common-hover no-drag' href="javascript:openCalendarAddModal()"
+                                    style='padding:5px;padding-left:15px;padding-right:15px;margin-right:15px;border-radius: 10px;border: 1px solid #444444'> 
+                                        add 
+                                    </a>
+                                </div>
+                                <div id='task-head-info' style="">
+
+                                </div>
+                                
+                            </div>
+                            <div id='task-list' class='flex-1'>
+                                
+                            </div>
+                            <div id='task-list-info-menu' style="display:none;position:fixed;background-color:#555555;width:150px;padding-top:3px;padding-bottom:3px;">
+                                <div class='common-hover pointer ' 
+                                    style='border: solid 1px #777777;padding:5px;'
+                                    onclick='taskListItemUpdateClick()' >
+                                    update
+                                </div>
+
+                                <div class='common-hover pointer ' 
+                                    style='border: solid 1px #777777;padding:5px;'
+                                    onclick='taskListItemDeleteClick()' >
+                                    delete
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

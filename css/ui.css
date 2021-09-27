@@ -52,6 +52,12 @@ td {
     cursor: pointer;
 }
 
+.menu-open {
+    background-color: #999999;
+    color:white;
+    font-weight: bolder;
+}
+
 .common-hover:hover {
     background-color: #4a4a4a;
     color:white;

@@ -20,7 +20,15 @@ function initUi(){
     })   
 }
 
-function changeMenu(num){
+function changeMenu(num,event){
+    var openMenu = $('.menu-open') ; 
+    openMenu.addClass('common-hover');
+    openMenu.removeClass('menu-open');
+
+    var target = $(event.target);
+    target.addClass('menu-open')
+    target.removeClass('common-hover')
+
     if ( num == 0 ) {
         $('#main-calendar').css("display",'flex')
         $('#main-task').css("display",'none')

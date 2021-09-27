@@ -1,5 +1,7 @@
-var userSeq = 1000000000 ; // null ; 
-var userToken = 'nMd0vvKG9N41JZBoX44bcllC72vBlN' ; // null ; 
+var userSeq = 1000000000 ; 
+userSeq = null ; 
+var userToken = 'nMd0vvKG9N41JZBoX44bcllC72vBlN' ; 
+userToken = null ; 
 
 $(document).ready(function(){
     initLoginFunc();
@@ -63,6 +65,8 @@ function login(){
                 userSeq = result.userSeq ; 
                 userToken = result.userToken ; 
                 closeLoginView();
+
+                renderCalendar();
             } else {
                 var message = '';
 				
@@ -89,7 +93,7 @@ function login(){
         } , 
         function(e){
             // console.log('error',e)
-            alert('error',e);
+            alertMessage('error','FAIL');
             closeLoading();
         }
 

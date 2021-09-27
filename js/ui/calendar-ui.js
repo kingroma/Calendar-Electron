@@ -8,6 +8,7 @@ function initCalendarUi() {
     console.log('initCalendarUi')
     $(window).on('mouseup',function(){
         stopCalendarUi();
+        $('#task-list-info-menu').css('display',"none");
     });
 
     $('#task-bar').on('mousedown',function(){
@@ -36,12 +37,13 @@ function startTaskDivClick(){
             var width = windowWidth - targetX - 5; 
 
             // var maxWidth = windowWidth / 3 ; 
-            var maxWidth = 333 ; 
+            var maxWidth = 400 ; 
+            var minWidth = 150 ;
             
-            if ( 50 < width && width < maxWidth ){
+            if ( minWidth < width && width < maxWidth ){
                 $('#task-div').css('width',width+'px')
-            } else if ( 50 > width ) {
-                $('#task-div').css('width',50+'px')
+            } else if ( minWidth > width ) {
+                $('#task-div').css('width',minWidth+'px')
             } else if ( width > maxWidth ){
                 $('#task-div').css('width',maxWidth+'px')
             }
