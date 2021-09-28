@@ -793,7 +793,7 @@ function changeTaskListItem(obj){
 
     var divTaskText = $('#task-list-item-task-text-' + obj.taskSeq); 
     divTaskText.empty();
-    divTaskText.append(obj.taskText);
+    divTaskText.append(obj.taskText.replaceAll('\n','<br />'));
 }
 
 function taskListItemDeleteClick(){

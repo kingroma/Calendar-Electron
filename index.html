@@ -24,6 +24,8 @@
         <script src="./js/func/login-func.js"></script>
         <script src="./js/ui/calendar-ui.js"></script>
         <script src="./js/func/calendar-func.js"></script>
+        <script src="./js/ui/memo-ui.js"></script>
+        <script src="./js/func/memo-func.js"></script>
 
         <link rel="stylesheet" type="text/css" href="./css/common.css"/>
         <link rel="stylesheet" type="text/css" href="./css/ui.css"/>
@@ -97,10 +99,18 @@
         </div>
         <div id='container' class='flex-display'>
             <div style="background-color:#222222;width:70px;">
-                <div class='calendar-menu pointer no-drag menu-open' onclick="changeMenu(0,event)"><img src="./assets/calendar.png" width="25px" height="25px"  /></div> <!-- Calendar -->
-                <!-- <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(1,event)">T</div> Task -->
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(2,event)">M</div> <!-- Memo -->
-                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3,event)">T</div> <!-- Tree -->
+                <!-- Calendar -->
+                <div class='calendar-menu pointer no-drag menu-open' onclick="changeMenu(0,event)"><img src="./assets/calendar.png" width="25px" height="25px"  /></div> 
+
+                <!-- Task -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(1,event)">T</div> 
+
+                <!-- Memo -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(2,event)">M</div> 
+
+                <!-- Tree -->
+                <div class='calendar-menu pointer common-hover no-drag' onclick="changeMenu(3,event)">T</div> 
+
             </div>
             <div id='main-calendar' class='flex-1 flex-display-column' style="background-color:#222222;">
                 <div id='calendar-add-modal' style='display:none' >
@@ -402,8 +412,11 @@
                 main-task
             </div>
 
-            <div id='main-memo' class='flex-1 flex-display-column' style='background-color:#444444;display:none'>
-                main-memo
+            <div id='main-memo' class='flex-1 flex-display' style='background-color:#444444;display:none'>
+                <div id='memo-tree-div' style="width:150px">
+                    
+                </div>
+                <div class='flex-1' style='background-color:#abcdef'></div>
             </div>
 
             <div id='main-tree' class='flex-1 flex-display-column' style='background-color:#666666;display:none'>

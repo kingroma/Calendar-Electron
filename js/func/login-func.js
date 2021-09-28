@@ -1,7 +1,7 @@
 var userSeq = 1000000000 ; 
-userSeq = null ; 
+// userSeq = null ; 
 var userToken = 'nMd0vvKG9N41JZBoX44bcllC72vBlN' ; 
-userToken = null ; 
+// userToken = null ; 
 
 $(document).ready(function(){
     initLoginFunc();
